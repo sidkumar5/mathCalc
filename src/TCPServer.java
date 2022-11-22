@@ -1,35 +1,67 @@
 import java.io.*;
 import java.net.*;
 
+import javax.management.OperationsException;
+
 class TCPServer {
 
     public static void main(String argv[]) throws Exception
     {
-        String clientSentence;
-        String capitalizedSentence;
+        String[] clientSentence;
 
         ServerSocket welcomeSocket = new ServerSocket(6789);
 
         while(true) {
-
             Socket connectionSocket = welcomeSocket.accept();
 
             BufferedReader inFromClient =
                     new BufferedReader(new
                             InputStreamReader(connectionSocket.getInputStream()));
 
-
-            DataOutputStream  outToClient =
+            DataOutputStream outToClient =
                     new DataOutputStream(connectionSocket.getOutputStream());
 
-            clientSentence = inFromClient.readLine();
+            /*
+             * TO-DO: 
+             * Input of 'help' returns usage information
+             * Input of 'exit', 'quit', or 'close' closes connection with client
+             */
+            
+            clientSentence = inFromClient.readLine().split(" ");
 
-            capitalizedSentence = clientSentence.toUpperCase() + '\n';
+            if (clientSentence.length != 3) {
+                outToClient.writeBytes("Expression is is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
+            }
+            else if (clientSentence[1].length() != 1) {
+                outToClient.writeBytes("Operand is not a single character.\n");
+            }
+            else {
+                // Parse input and perform given operation
+                try {
+                    int operand1 = Integer.parseInt(clientSentence[0]);
+                    char operator = clientSentence[1].charAt(0);
+                    int operand2 = Integer.parseInt(clientSentence[2]);
 
-            outToClient.writeBytes(capitalizedSentence);
+                    if (operator == '+') {
+                        outToClient.writeBytes(Integer.toString(operand1 + operand2) + "\n");
+                    }
+                    else if (operator == '-') {
+                        outToClient.writeBytes(Integer.toString(operand1 - operand2) + "\n");
+                    }
+                    else if (operator == '*') {
+                        outToClient.writeBytes(Integer.toString(operand1 * operand2) + "\n");
+                    }
+                    else if (operator == '/') {
+                        outToClient.writeBytes(Integer.toString(operand1 / operand2) + "\n");
+                    }
+                    else {
+                        outToClient.writeBytes("Operand is not supported (must be + - * /).\n");
+                    }
+                }
+                catch (NumberFormatException e) {
+                    outToClient.writeBytes("Operands are not valid integers.\n");
+                }
+            }
         }
     }
-} 
- 
-
-           
+}
