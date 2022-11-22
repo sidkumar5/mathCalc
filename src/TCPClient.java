@@ -6,6 +6,7 @@ class TCPClient {
     public static void main(String argv[]) throws Exception
     {
         String sentence;
+        String name;
         String modifiedSentence;
 
         BufferedReader inFromUser =
@@ -20,13 +21,25 @@ class TCPClient {
                 new BufferedReader(new
                         InputStreamReader(clientSocket.getInputStream()));
 
-        sentence = inFromUser.readLine();
+        System.out.println("Please enter your name: ");
+        name = inFromUser.readLine();
 
-        outToServer.writeBytes(sentence + '\n');
+        outToServer.writeBytes(name + '\n');
 
-        modifiedSentence = inFromServer.readLine();
 
-        System.out.println("FROM SERVER: " + modifiedSentence);
+
+        System.out.println("Thank you! Connection was successful.");
+        do {
+            System.out.println("Enter an operation: ");
+            sentence = inFromUser.readLine();
+
+            outToServer.writeBytes(sentence + '\n');
+
+            modifiedSentence = inFromServer.readLine();
+
+            System.out.println("FROM SERVER: " + modifiedSentence);
+
+        } while(sentence != "exit");
 
         clientSocket.close();
 

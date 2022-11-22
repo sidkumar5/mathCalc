@@ -1,33 +1,44 @@
 import java.io.*;
 import java.net.*;
-
-import javax.management.OperationsException;
+import java.util.Vector;
 
 class TCPServer {
 
     public static void main(String argv[]) throws Exception
     {
-        String[] clientSentence;
+        Vector<Client> clientsVector = new Vector<>();
 
         ServerSocket welcomeSocket = new ServerSocket(6789);
 
         while(true) {
             Socket connectionSocket = welcomeSocket.accept();
+            Client c = new Client(connectionSocket);
+            clientsVector.add(c);
 
-            BufferedReader inFromClient =
-                    new BufferedReader(new
-                            InputStreamReader(connectionSocket.getInputStream()));
+        }
+    }
+}
 
-            DataOutputStream outToClient =
-                    new DataOutputStream(connectionSocket.getOutputStream());
+class Client {
+    String clientName;
+    String connectionTime;
+    BufferedReader inFromClient;
+    DataOutputStream  outToClient;
+    int solution;
 
+    public Client(Socket connectionSocket) throws Exception {
+        inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+        clientName = inFromClient.readLine();
+
+        while(true) {
             /*
              * TO-DO: 
              * Input of 'help' returns usage information
              * Input of 'exit', 'quit', or 'close' closes connection with client
              */
             
-            clientSentence = inFromClient.readLine().split(" ");
+            String[] clientSentence = inFromClient.readLine().split(" ");
 
             if (clientSentence.length != 3) {
                 outToClient.writeBytes("Expression is is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
