@@ -1,6 +1,7 @@
 //testing this
 import java.io.*;
 import java.net.*;
+
 class TCPClient {
 
     public static void main(String argv[]) throws Exception
@@ -29,9 +30,10 @@ class TCPClient {
 
 
         System.out.println("Thank you! Connection was successful.");
-        do {
+        while(true) {
             System.out.println("Enter an operation: ");
             sentence = inFromUser.readLine();
+            System.out.println(sentence);
 
             outToServer.writeBytes(sentence + '\n');
 
@@ -39,7 +41,7 @@ class TCPClient {
 
             System.out.println("FROM SERVER: " + modifiedSentence);
 
-        } while(sentence != "exit");
+        }
 
         clientSocket.close();
 
