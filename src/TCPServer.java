@@ -43,7 +43,9 @@ class Client {
             if(cSentence.equals("exit")) {
                 System.out.println("Client " + clientName + " has disconnected");
                 break;
-            } else {
+            } else if(cSentence.equals("help")) {
+                outToClient.writeBytes("To use the calculator, please enter a simple expression with 2 operands and an operator separated by white space. (i.e. 2 + 3).\n");
+            }  else {
 
                 String[] clientSentence = cSentence.split(" ");
 
