@@ -12,20 +12,19 @@ class TCPServer {
 
         while(true) {
             Socket connectionSocket = welcomeSocket.accept();
-            Client c = new Client(connectionSocket);
 
-
-            clientsVector.add(c);
+            Thread t = new Client(connectionSocket);
+            t.start();
 
         }
     }
 }
 
-class Client {
+class Client extends Thread {
     String clientName;
     String connectionTime;
     BufferedReader inFromClient;
-    DataOutputStream  outToClient;
+    DataOutputStream outToClient;
     int solution;
 
     public Client(Socket connectionSocket) throws Exception {
@@ -33,47 +32,55 @@ class Client {
         outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         clientName = inFromClient.readLine();
         System.out.println(clientName + " has connected!");
+    }
 
-        while(true) {
+    @Override
+    public void run()  {
+        while (true) {
+            try {
+                String cSentence = inFromClient.readLine();
 
-            String cSentence = inFromClient.readLine();
-
-            if(cSentence.equals("exit")) {
-                System.out.println(clientName + " has disconnected!");
-                break;
-            } else if(cSentence.equals("help")) {
-                outToClient.writeBytes("To use the calculator, please enter a simple expression with 2 operands and an operator separated by white space. (i.e. 2 + 3). To exit the program, simply type exit. \n");
-            }  else {
-
-                String[] clientSentence = cSentence.split(" ");
-
-                if (clientSentence.length != 3) {
-                    outToClient.writeBytes("Expression is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
-                } else if (clientSentence[1].length() != 1) {
-                    outToClient.writeBytes("Operand is not a single character.\n");
+                if (cSentence.equals("exit")) {
+                    System.out.println(clientName + " has disconnected!");
+                    break;
+                } else if (cSentence.equals("help")) {
+                    outToClient.writeBytes("To use the calculator, please enter a simple expression with 2 operands and an operator separated by white space. (i.e. 2 + 3). To exit the program, simply type exit. \n");
                 } else {
-                    // Parse input and perform given operation
-                    try {
-                        int operand1 = Integer.parseInt(clientSentence[0]);
-                        char operator = clientSentence[1].charAt(0);
-                        int operand2 = Integer.parseInt(clientSentence[2]);
 
-                        if (operator == '+') {
-                            outToClient.writeBytes(Integer.toString(operand1 + operand2) + "\n");
-                        } else if (operator == '-') {
-                            outToClient.writeBytes(Integer.toString(operand1 - operand2) + "\n");
-                        } else if (operator == '*') {
-                            outToClient.writeBytes(Integer.toString(operand1 * operand2) + "\n");
-                        } else if (operator == '/') {
-                            outToClient.writeBytes(Integer.toString(operand1 / operand2) + "\n");
-                        } else {
-                            outToClient.writeBytes("Operand is not supported (must be + - * /).\n");
+                    String[] clientSentence = cSentence.split(" ");
+
+                    if (clientSentence.length != 3) {
+                        outToClient.writeBytes("Expression is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
+                    } else if (clientSentence[1].length() != 1) {
+                        outToClient.writeBytes("Operand is not a single character.\n");
+                    } else {
+                        // Parse input and perform given operation
+                        try {
+                            int operand1 = Integer.parseInt(clientSentence[0]);
+                            char operator = clientSentence[1].charAt(0);
+                            int operand2 = Integer.parseInt(clientSentence[2]);
+
+                            if (operator == '+') {
+                                outToClient.writeBytes(Integer.toString(operand1 + operand2) + "\n");
+                            } else if (operator == '-') {
+                                outToClient.writeBytes(Integer.toString(operand1 - operand2) + "\n");
+                            } else if (operator == '*') {
+                                outToClient.writeBytes(Integer.toString(operand1 * operand2) + "\n");
+                            } else if (operator == '/') {
+                                outToClient.writeBytes(Integer.toString(operand1 / operand2) + "\n");
+                            } else {
+                                outToClient.writeBytes("Operand is not supported (must be + - * /).\n");
+                            }
+                        } catch (NumberFormatException e) {
+                            outToClient.writeBytes("Operands are not valid integers.\n");
                         }
-                    } catch (NumberFormatException e) {
-                        outToClient.writeBytes("Operands are not valid integers.\n");
                     }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            }
+        }
+
+
         }
     }
