@@ -33,46 +33,47 @@ class Client {
 
         while(true) {
             /*
-             * TO-DO: 
+             * TO-DO:
              * Input of 'help' returns usage information
              * Input of 'exit', 'quit', or 'close' closes connection with client
              */
-            
-            String[] clientSentence = inFromClient.readLine().split(" ");
 
-            if (clientSentence.length != 3) {
-                outToClient.writeBytes("Expression is is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
-            }
-            else if (clientSentence[1].length() != 1) {
-                outToClient.writeBytes("Operand is not a single character.\n");
-            }
-            else {
-                // Parse input and perform given operation
-                try {
-                    int operand1 = Integer.parseInt(clientSentence[0]);
-                    char operator = clientSentence[1].charAt(0);
-                    int operand2 = Integer.parseInt(clientSentence[2]);
+            String cSentence = inFromClient.readLine();
 
-                    if (operator == '+') {
-                        outToClient.writeBytes(Integer.toString(operand1 + operand2) + "\n");
-                    }
-                    else if (operator == '-') {
-                        outToClient.writeBytes(Integer.toString(operand1 - operand2) + "\n");
-                    }
-                    else if (operator == '*') {
-                        outToClient.writeBytes(Integer.toString(operand1 * operand2) + "\n");
-                    }
-                    else if (operator == '/') {
-                        outToClient.writeBytes(Integer.toString(operand1 / operand2) + "\n");
-                    }
-                    else {
-                        outToClient.writeBytes("Operand is not supported (must be + - * /).\n");
+            if(cSentence.equals("exit")) {
+                System.out.println("Client " + clientName + " has disconnected");
+                break;
+            } else {
+
+                String[] clientSentence = cSentence.split(" ");
+
+                if (clientSentence.length != 3) {
+                    outToClient.writeBytes("Expression is not 3 terms or not properly formatted (i.e. 2 + 3).\n");
+                } else if (clientSentence[1].length() != 1) {
+                    outToClient.writeBytes("Operand is not a single character.\n");
+                } else {
+                    // Parse input and perform given operation
+                    try {
+                        int operand1 = Integer.parseInt(clientSentence[0]);
+                        char operator = clientSentence[1].charAt(0);
+                        int operand2 = Integer.parseInt(clientSentence[2]);
+
+                        if (operator == '+') {
+                            outToClient.writeBytes(Integer.toString(operand1 + operand2) + "\n");
+                        } else if (operator == '-') {
+                            outToClient.writeBytes(Integer.toString(operand1 - operand2) + "\n");
+                        } else if (operator == '*') {
+                            outToClient.writeBytes(Integer.toString(operand1 * operand2) + "\n");
+                        } else if (operator == '/') {
+                            outToClient.writeBytes(Integer.toString(operand1 / operand2) + "\n");
+                        } else {
+                            outToClient.writeBytes("Operand is not supported (must be + - * /).\n");
+                        }
+                    } catch (NumberFormatException e) {
+                        outToClient.writeBytes("Operands are not valid integers.\n");
                     }
                 }
-                catch (NumberFormatException e) {
-                    outToClient.writeBytes("Operands are not valid integers.\n");
-                }
+            }
             }
         }
     }
-}
