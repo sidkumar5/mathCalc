@@ -13,6 +13,8 @@ class TCPServer {
         while(true) {
             Socket connectionSocket = welcomeSocket.accept();
             Client c = new Client(connectionSocket);
+
+
             clientsVector.add(c);
 
         }
@@ -30,21 +32,17 @@ class Client {
         inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         clientName = inFromClient.readLine();
+        System.out.println(clientName + " has connected!");
 
         while(true) {
-            /*
-             * TO-DO:
-             * Input of 'help' returns usage information
-             * Input of 'exit', 'quit', or 'close' closes connection with client
-             */
 
             String cSentence = inFromClient.readLine();
 
             if(cSentence.equals("exit")) {
-                System.out.println("Client " + clientName + " has disconnected");
+                System.out.println(clientName + " has disconnected!");
                 break;
             } else if(cSentence.equals("help")) {
-                outToClient.writeBytes("To use the calculator, please enter a simple expression with 2 operands and an operator separated by white space. (i.e. 2 + 3).\n");
+                outToClient.writeBytes("To use the calculator, please enter a simple expression with 2 operands and an operator separated by white space. (i.e. 2 + 3). To exit the program, simply type exit. \n");
             }  else {
 
                 String[] clientSentence = cSentence.split(" ");
